@@ -15,16 +15,18 @@ class CustomUserFullSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
+        read_only_fields = ['email']
+
 
 class BuyerUserProfileSerializer(serializers.ModelSerializer):
-    user = CustomUserFullSerializer()
+    user = CustomUserSerializer()
 
     class Meta:
         model = BuyerUserProfile
         fields = ['user']
 
 class SellerUserProfileSerializer(serializers.ModelSerializer):
-    user = CustomUserFullSerializer()
+    user = CustomUserSerializer()
 
     class Meta:
         model = SellerUserProfile
