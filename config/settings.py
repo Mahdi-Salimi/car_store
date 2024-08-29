@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'accounts',
+    'products',
 ]
 
 MIDDLEWARE = [
@@ -66,7 +67,15 @@ DATABASES = {
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': config('DB_HOST'),
         'PORT': config('DB_PORT'),
-    }
+    },
+    'cars_database': {
+        'ENGINE': config('DB_ENGINE', default='django.db.backends.mysql'),
+        'NAME': config('DB_NAME_Cars'),
+        'USER': config('DB_USER_Cars'),
+        'PASSWORD': config('DB_PASSWORD_Cars'),
+        'HOST': config('DB_HOST_Cars'),
+        'PORT': config('DB_PORT_Cars'),
+        },
 }
 
 
