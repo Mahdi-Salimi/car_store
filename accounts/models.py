@@ -26,6 +26,7 @@ class CustomUser(AbstractUser):
         BUYER = 'b', 'Buyer'
         SELLER = 's', 'Seller'
 
+    username = None
     user_type = models.CharField(max_length=1, choices=UserType.choices, default=UserType.BUYER)
     email = models.EmailField(unique=True, max_length=255)
     phone_number = models.CharField(max_length=15, blank=True, validators=[validate_phone_number])

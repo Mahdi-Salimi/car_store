@@ -3,6 +3,7 @@ from django.utils import timezone
 
 class Car(models.Model):
     id = models.AutoField(primary_key=True)
+    # seller = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     url = models.CharField(max_length=255)
     title = models.CharField(max_length=255)
     time = models.DateTimeField()
@@ -27,3 +28,10 @@ class Car(models.Model):
 
     def __str__(self):
         return self.title
+
+
+# class CarImage(models.Model):
+#     car = models.ForeignKey(Car, related_name='images', on_delete=models.CASCADE)
+#     image_url = models.CharField(max_length=255)
+
+# Wishlist, Review

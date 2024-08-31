@@ -1,8 +1,10 @@
 from datetime import timedelta
+import pymysql
 
 from pathlib import Path
 from decouple import config, Csv
 
+pymysql.install_as_MySQLdb()
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,6 +26,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'accounts',
     'products',
+    'orders',
 ]
 
 MIDDLEWARE = [
