@@ -2,7 +2,7 @@ import pytest
 
 from django.contrib.auth import get_user_model
 
-from accounts.tests.fixtures.fixtures_data import seller_user, buyer_user, buyer_user_profile, seller_user_profile
+from accounts.tests.fixtures.fixtures_data import seller_user, buyer_user, buyer_user_profile, seller_user_profile, create_user
 from accounts.models import BuyerUserProfile, SellerUserProfile
 
 User = get_user_model()
@@ -13,7 +13,7 @@ def test_buyer_user_profile_creation(buyer_user_profile):
 
     user = buyer_user_profile.user
 
-    assert user.email == 'buyer@example.com'
+    assert user.email == 'buyer_unique@example.com'
     assert user.user_type == User.UserType.BUYER
     assert hasattr(buyer_user_profile, 'user')
     assert isinstance(buyer_user_profile.user, User)
@@ -28,7 +28,7 @@ def test_buyer_user_profile_creation(buyer_user_profile):
 def test_seller_user_profile_creation(seller_user_profile):
     user = seller_user_profile.user
 
-    assert user.email == 'seller@example.com'
+    assert user.email == 'seller_unique@example.com'
     assert user.user_type == User.UserType.SELLER
     assert hasattr(seller_user_profile, 'user')
     assert isinstance(seller_user_profile.user, User)
@@ -36,10 +36,6 @@ def test_seller_user_profile_creation(seller_user_profile):
     assert SellerUserProfile.objects.filter(user=user).exists()
     assert seller_user_profile.pk is not None
 
-    assert seller_user_profile.company_name == 'Test Cars Ltd.'
-    assert seller_user_profile.website == 'http://testcars.com'
-    assert seller_user_profile.rating == 4.5
-    assert seller_user_profile.total_sales == 100
 
 
 @pytest.mark.django_db

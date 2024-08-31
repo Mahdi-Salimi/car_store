@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model, authenticate
 
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.exceptions import AuthenticationFailed
+
 
 from accounts.models import BuyerUserProfile, SellerUserProfile
 
@@ -11,7 +13,6 @@ class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['email', 'user_type', 'phone_number', 'date_of_birth', 'address']
-        read_only_fields = ['email']
 
 class CustomUserFullSerializer(serializers.ModelSerializer):
     class Meta:
@@ -90,5 +91,5 @@ class LoginSerializer(serializers.Serializer):
     def validate(self, data):
         user = authenticate(email=data['email'], password=data['password'])
         if not user:
-            raise serializers.ValidationError("Invalid login credentials")
+            raise AuthenticationFailed("Invalid login credentials")
         return data
