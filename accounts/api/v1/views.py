@@ -7,10 +7,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from accounts.api.v1.serializers import CustomUserSerializer, CustomUserFullSerializer, BuyerUserProfileSerializer, SellerUserProfileSerializer, RegisterSerializer, LoginSerializer
 from accounts.models import BuyerUserProfile, SellerUserProfile
+from accounts.permissions import IsOwner
 
 class CustomUserRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = CustomUserSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwner]
 
     def get_object(self):
         return self.request.user
@@ -18,7 +19,7 @@ class CustomUserRetrieveUpdateView(generics.RetrieveUpdateAPIView):
 
 class BuyerUserProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = BuyerUserProfileSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwner]
 
     def get_object(self):
         return BuyerUserProfile.objects.get(user=self.request.user)
@@ -26,7 +27,7 @@ class BuyerUserProfileView(generics.RetrieveUpdateAPIView):
 
 class SellerUserProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = SellerUserProfileSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwner]
 
     def get_object(self):
         return SellerUserProfile.objects.get(user=self.request.user)

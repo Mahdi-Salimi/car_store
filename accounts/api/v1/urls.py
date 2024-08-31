@@ -6,8 +6,8 @@ from accounts.api.v1.views import CustomUserRetrieveUpdateView, BuyerUserProfile
 
 urlpatterns = [
     path('', CustomUserRetrieveUpdateView.as_view(), name='user-detail'),
-    path('buyer-profile/', BuyerUserProfileView.as_view(), name='buyer-profile'),
-    path('seller-profile/', SellerUserProfileView.as_view(), name='seller-profile'),
+    path('buyerprofile/', BuyerUserProfileView.as_view(), name='buyer-profile'),
+    path('sellerprofile/', SellerUserProfileView.as_view(), name='seller-profile'),
     path('register/', RegisterView.as_view(), name='register'),
     path('login/', LoginView.as_view(), name='login'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
