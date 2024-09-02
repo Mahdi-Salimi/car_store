@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from products.models import Car
+from products.models import Car, CarImage, Wishlist
 
 @admin.register(Car)
 class CarAdmin(admin.ModelAdmin):
@@ -25,3 +25,21 @@ class CarAdmin(admin.ModelAdmin):
         for instance in instances:
             instance.save(using='cars_database')
         formset.save_m2m()
+
+class CarImageInline(admin.TabularInline):
+    model = CarImage
+    extra = 1
+
+@admin.register(Wishlist)
+class WishlistAdmin(admin.ModelAdmin):
+    list_display = ('user', 'car', 'added_at')
+    search_fields = ('user__username', 'car__title')
+    list_filter = ('added_at',)
+    date_hierarchy = 'added_at'
+    ordering = ('-added_at',)
+
+@admin.register(CarImage)
+class CarImageAdmin(admin.ModelAdmin):
+    list_display = ('car', 'image_url')
+    search_fields = ('car__title',)
+    ordering = ('car',)
