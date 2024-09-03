@@ -19,15 +19,7 @@ class Car(models.Model):
     price = models.FloatField(null=True, blank=True)
 
     class Meta:
-        db_table = 'cars_new'
-
-    def save(self, *args, **kwargs):
-        kwargs['using'] = 'cars_database'
-        super(Car, self).save(*args, **kwargs)
-
-    @classmethod
-    def get_queryset(cls):
-        return super(Car, cls).objects.using('cars_database')
+        unique_together = ('url', 'time')
 
     def __str__(self):
         return self.title

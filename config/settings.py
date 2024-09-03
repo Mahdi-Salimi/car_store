@@ -71,15 +71,18 @@ DATABASES = {
         'HOST': config('DB_HOST'),
         'PORT': config('DB_PORT'),
     },
-    'cars_database': {
-        'ENGINE': config('DB_ENGINE', default='django.db.backends.mysql'),
-        'NAME': config('DB_NAME_Cars'),
-        'USER': config('DB_USER_Cars'),
-        'PASSWORD': config('DB_PASSWORD_Cars'),
-        'HOST': config('DB_HOST_Cars'),
-        'PORT': config('DB_PORT_Cars'),
-        },
+    # 'cars_database': {
+    #     'ENGINE': config('DB_ENGINE', default='django.db.backends.mysql'),
+    #     'NAME': config('DB_NAME_Cars'),
+    #     'USER': config('DB_USER_Cars'),
+    #     'PASSWORD': config('DB_PASSWORD_Cars'),
+    #     'HOST': config('DB_HOST_Cars'),
+    #     'PORT': config('DB_PORT_Cars'),
+    #     },
 }
+
+# DATABASE_ROUTERS = ['config.db_routers.CarDatabaseRouter']
+
 
 
 # Password validation
