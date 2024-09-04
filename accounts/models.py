@@ -1,6 +1,12 @@
+import uuid
+
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.contrib.auth.models import BaseUserManager
+from django.utils import timezone
+from django.contrib.auth.hashers import make_password, check_password
+
 
 from accounts.validations.models_validations import validate_phone_number
 
@@ -68,5 +74,27 @@ class SellerUserProfile(models.Model):
 
     def __str__(self):
         return f'{self.user.username} (Seller)'
+
+User = get_user_model()
+
+class OTP(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    otp = models.CharField(max_length=128)
+    created_at = models.DateTimeField(auto_now_add=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    used_at = models.DateTimeField(null=True, blank=True)
+
+    def is_valid(self):
+        if self.used_at is not None:
+            return False
+
+        return (timezone.now() - self.created_at).total_seconds() < 120
+
+    def set_otp(self, otp):
+        self.otp = make_password(otp)
+
+    def check_otp(self, otp):
+        return check_password(otp, self.otp)
+
 
 

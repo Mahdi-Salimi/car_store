@@ -93,3 +93,30 @@ class LoginSerializer(serializers.Serializer):
         if not user:
             raise AuthenticationFailed("Invalid login credentials")
         return data
+
+class SendOTPSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        if not User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("User with this email does not exist.")
+        return value
+
+class VerifyOTPSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    otp = serializers.CharField(max_length=6)
+
+    def validate(self, data):
+        user = User.objects.get(email=data['email'])
+        try:
+            otp_record = user.otp_set.latest('created_at')
+        except OTP.DoesNotExist:
+            raise serializers.ValidationError("OTP does not exist or has expired.")
+
+        if not otp_record.is_valid():
+            raise serializers.ValidationError("OTP has expired.")
+
+        if not otp_record.check_otp(data['otp']):
+            raise serializers.ValidationError("Invalid OTP.")
+
+        return data
