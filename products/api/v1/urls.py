@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import CarViewSet, WishlistViewSet, CarImageViewSet
+from products.api.v1.views import CarViewSet, WishlistViewSet, CarImageViewSet
 
 router = DefaultRouter()
 router.register(r'cars', CarViewSet)

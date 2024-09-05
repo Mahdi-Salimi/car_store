@@ -2,7 +2,7 @@ from rest_framework import viewsets, permissions, filters
 from rest_framework.pagination import PageNumberPagination
 
 from products.models import Car, Wishlist, CarImage
-from ads.api.v1.serializers import CarSerializer, WishlistSerializer, CarImageSerializer
+from products.api.v1.serializers import CarSerializer, WishlistSerializer, CarImageSerializer
 from accounts.permissions import IsOwner
 
 class StandardResultsSetPagination(PageNumberPagination):
