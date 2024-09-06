@@ -18,7 +18,7 @@ from accounts.utils import generate_otp
 from accounts.tasks import send_otp_email, send_password_reset_email
 
 from accounts.api.v1.serializers import CustomUserSerializer, CustomUserFullSerializer, BuyerUserProfileSerializer, \
-    SellerUserProfileSerializer, RegisterSerializer, LoginSerializer, SendOTPSerializer, VerifyOTPSerializer, PasswordResetSerializer, PasswordResetConfirmSerializer
+    SellerUserProfileSerializer, RegisterSerializer, LoginSerializer, SendOTPSerializer, VerifyOTPSerializer, PasswordResetSerializer, PasswordResetConfirmSerializer, ChangePasswordSerializer
 from accounts.models import BuyerUserProfile, SellerUserProfile, OTP
 from accounts.permissions import IsOwner
 
@@ -161,3 +161,21 @@ class PasswordResetConfirmView(generics.GenericAPIView):
         serializer.save()
 
         return Response({"detail": "Password has been reset successfully."}, status=status.HTTP_200_OK)
+
+class ChangePasswordView(generics.UpdateAPIView):
+
+    serializer_class = ChangePasswordSerializer
+    model = get_user_model()
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def update(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'detail': 'Password changed successfully'}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
