@@ -1,9 +1,10 @@
-
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.throttling import ScopedRateThrottle
+
 
 from django.contrib.auth import get_user_model
 from django.utils import timezone
@@ -61,6 +62,8 @@ class RegisterView(generics.CreateAPIView):
 class LoginView(APIView):
     permission_classes = [AllowAny]
     serializer_class = LoginSerializer
+    throttle_scope = 'login'
+    throttle_classes = [ScopedRateThrottle]
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
@@ -84,6 +87,8 @@ class SendOTPView(APIView):
 
 
 class VerifyOTPView(APIView):
+    throttle_scope = 'login'
+    throttle_classes = [ScopedRateThrottle]
     def post(self, request):
         serializer = VerifyOTPSerializer(data=request.data)
         if serializer.is_valid():
