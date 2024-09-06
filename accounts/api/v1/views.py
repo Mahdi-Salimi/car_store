@@ -8,14 +8,14 @@ from rest_framework.throttling import ScopedRateThrottle
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.urls import reverse
-from django.utils.http import urlsafe_base64_encode
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
-from django.utils.encoding import force_bytes
-
+from django.utils.encoding import force_bytes, force_str
+from django.contrib.sites.shortcuts import get_current_site
 
 
 from accounts.utils import generate_otp
-from accounts.tasks import send_otp_email, send_password_reset_email
+from accounts.tasks import send_otp_email, send_password_reset_email, send_verification_email
 
 from accounts.api.v1.serializers import CustomUserSerializer, CustomUserFullSerializer, BuyerUserProfileSerializer, \
     SellerUserProfileSerializer, RegisterSerializer, LoginSerializer, SendOTPSerializer, VerifyOTPSerializer, PasswordResetSerializer, PasswordResetConfirmSerializer, ChangePasswordSerializer
@@ -187,3 +187,36 @@ class DeleteAccountView(APIView):
         user = request.user
         user.delete()
         return Response({'detail': 'Account deleted successfully'}, status=status.HTTP_200_OK)
+
+class EmailVerificationView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        if not user.email:
+            return Response({"detail": "No email associated with this account."}, status=400)
+
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+        verification_url = f"http://{get_current_site(request).domain}/accounts/api/v1/verify-email/{uid}/{token}/"
+
+        send_verification_email.delay(user.email, verification_url)
+
+        return Response({"detail": "Verification email sent."}, status=200)
+
+class VerifyEmailView(APIView):
+    def get(self, request, uidb64, token):
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+
+        if user is not None and default_token_generator.check_token(user, token):
+            user.is_active = True
+            user.email_verified = True
+            user.save()
+            return Response({"detail": "Email verified successfully."}, status=200)
+        else:
+            return Response({"detail": "Invalid verification link or token."}, status=400)

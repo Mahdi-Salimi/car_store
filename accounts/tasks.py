@@ -15,3 +15,10 @@ def send_password_reset_email(email, token_url):
     message = f'Click the link below to reset your password:\n{token_url}'
     from_email = 'web3@bama.com'
     send_mail(subject, message, from_email, [email])
+
+@shared_task
+def send_verification_email(email, verification_url):
+    subject = "Verify your email"
+    message = f"Please verify your email by clicking on the following link: {verification_url}"
+    from_email = settings.DEFAULT_FROM_EMAIL
+    send_mail(subject, message, from_email, [email])

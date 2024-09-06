@@ -38,6 +38,7 @@ class CustomUser(AbstractUser):
     phone_number = models.CharField(max_length=15, blank=True, validators=[validate_phone_number])
     date_of_birth = models.DateField(blank=True, null=True)
     address = models.TextField(blank=True)
+    email_verified = models.BooleanField(default=False)
 
     date_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now=True)
