@@ -3,7 +3,7 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from accounts.api.v1.views import CustomUserRetrieveUpdateView, BuyerUserProfileView, SellerUserProfileView, LoginView, \
-    RegisterView, SendOTPView, VerifyOTPView, LogoutView
+    RegisterView, SendOTPView, VerifyOTPView, LogoutView, PasswordResetView, PasswordResetConfirmView
 
 urlpatterns = [
     path('', CustomUserRetrieveUpdateView.as_view(), name='user-detail'),
@@ -15,5 +15,8 @@ urlpatterns = [
     path('send_otp_login/', SendOTPView.as_view(), name='send-otp-login'),
     path('verify_otp_login/', VerifyOTPView.as_view(), name='verify-otp-login'),
     path('logout/', LogoutView.as_view(), name='logout'),
+    path('password-reset/', PasswordResetView.as_view(), name='password-reset'),
+    path('password-reset-confirm/<uidb64>/<token>/', PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
+
 
 ]

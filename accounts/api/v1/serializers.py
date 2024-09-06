@@ -4,6 +4,9 @@ from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.exceptions import AuthenticationFailed
 
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_decode
+
 
 from accounts.models import BuyerUserProfile, SellerUserProfile
 
@@ -120,3 +123,37 @@ class VerifyOTPSerializer(serializers.Serializer):
             raise serializers.ValidationError("Invalid OTP.")
 
         return data
+
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        try:
+            user = User.objects.get(email=value)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("User with this email does not exist.")
+        return value
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    uidb64 = serializers.CharField()
+    token = serializers.CharField()
+    new_password = serializers.CharField()
+
+    def validate(self, data):
+        try:
+            uid = urlsafe_base64_decode(data['uidb64']).decode()
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            raise serializers.ValidationError('Invalid token or user ID')
+
+        if not default_token_generator.check_token(user, data['token']):
+            raise serializers.ValidationError('Invalid token')
+
+        return data
+
+    def save(self):
+        uid = urlsafe_base64_decode(self.validated_data['uidb64']).decode()
+        user = User.objects.get(pk=uid)
+        user.set_password(self.validated_data['new_password'])
+        user.save()
+        return user
