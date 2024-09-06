@@ -23,8 +23,8 @@ urlpatterns = [
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('admin/', admin.site.urls),
-    path('accounts/api/v1', include('accounts.api.v1.urls')),
-    path('products/api/v1', include('products.api.v1.urls')),
-    path('ads/api/v1', include('ads.api.v1.urls')),
-    path('payment/api/v1', include('payment.api.v1.urls')),
+    path('accounts/api/v1/', include('accounts.api.v1.urls')),
+    path('products/api/v1/', include('products.api.v1.urls')),
+    path('ads/api/v1/', include('ads.api.v1.urls')),
+    path('payment/api/v1/', include('payment.api.v1.urls')),
 ]
