@@ -33,5 +33,7 @@ class Wishlist(models.Model):
     car = models.ForeignKey(Car, related_name='wishlisted_by', on_delete=models.CASCADE)
     added_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        unique_together = ('user', 'car')
     def __str__(self):
         return f"{self.user.username}'s wishlist item: {self.car.title}"
