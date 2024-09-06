@@ -1,3 +1,13 @@
 from django.contrib import admin
+from ads.models import Ad
+from products.models import Car
 
-# Register your models here.
+class AdAdmin(admin.ModelAdmin):
+    list_display = ('car', 'seller', 'is_promoted', 'start_date', 'end_date', 'payment_status')
+    list_filter = ('is_promoted', 'payment_status', 'start_date', 'end_date')
+    search_fields = ('car__title', 'seller__username')
+    ordering = ('-start_date',)
+    date_hierarchy = 'start_date'
+    autocomplete_fields = ['car', 'seller']
+
+admin.site.register(Ad, AdAdmin)
