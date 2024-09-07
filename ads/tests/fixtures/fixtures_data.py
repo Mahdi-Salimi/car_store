@@ -76,3 +76,48 @@ def ad_instance(car_instance, seller_user):
         end_date=timezone.now() + timezone.timedelta(days=30),
         payment_status="pending"
     )
+
+@pytest.fixture
+def another_car_instance():
+    return Car.objects.create(
+        title="Another Test Car",
+        description="This is another test car",
+        price=12000,
+        year=2021,
+        time=timezone.now(),
+    )
+@pytest.fixture
+def promoted_ad_instance(car_instance, seller_user):
+    return Ad.objects.create(
+        car=car_instance,
+        seller=seller_user,
+        is_promoted=True,
+        start_date=timezone.now(),
+        end_date=timezone.now() + timezone.timedelta(days=30),
+        payment_status="paid"
+    )
+
+@pytest.fixture
+def non_promoted_ad_instance(another_car_instance, seller_user):
+    return Ad.objects.create(
+        car=another_car_instance,
+        seller=seller_user,
+        is_promoted=False,
+        start_date=timezone.now(),
+        end_date=timezone.now() + timezone.timedelta(days=30),
+        payment_status="pending"
+    )
+
+@pytest.fixture
+def another_seller_ad_instance(another_car_instance, buyer_user):
+    return Ad.objects.create(
+        car=another_car_instance,
+        seller=buyer_user,
+        is_promoted=False,
+        start_date=timezone.now(),
+        end_date=timezone.now() + timezone.timedelta(days=30),
+        payment_status="pending"
+    )
+
+
+
