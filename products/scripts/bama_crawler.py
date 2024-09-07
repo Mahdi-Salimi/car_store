@@ -129,7 +129,6 @@ async def insert_data(results):
             exists = await sync_to_async(Car.objects.filter(url=car_data['url'], time=car_data['time']).exists)()
             if not exists:
                 await sync_to_async(Car.objects.create)(
-                    seller=None,
                     url=car_data['url'],
                     title=car_data['title'],
                     time=car_data['time'],
