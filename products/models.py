@@ -8,7 +8,7 @@ class Car(models.Model):
     id = models.AutoField(primary_key=True)
     url = models.CharField(max_length=255)
     title = models.CharField(max_length=255)
-    time = models.DateTimeField()
+    time = models.DateTimeField(null=True, blank=True)
     year = models.IntegerField()
     mileage = models.FloatField(null=True, blank=True)
     location = models.CharField(max_length=255, null=True, blank=True)

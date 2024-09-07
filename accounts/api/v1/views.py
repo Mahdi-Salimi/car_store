@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.throttling import ScopedRateThrottle
 
+from django.core.cache import cache
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.urls import reverse
@@ -21,6 +22,7 @@ from accounts.api.v1.serializers import CustomUserSerializer, CustomUserFullSeri
     SellerUserProfileSerializer, RegisterSerializer, LoginSerializer, SendOTPSerializer, VerifyOTPSerializer, PasswordResetSerializer, PasswordResetConfirmSerializer, ChangePasswordSerializer
 from accounts.models import BuyerUserProfile, SellerUserProfile, OTP
 from accounts.permissions import IsOwner
+from config.settings import CACHE_TTL
 
 User = get_user_model()
 
@@ -220,3 +222,5 @@ class VerifyEmailView(APIView):
             return Response({"detail": "Email verified successfully."}, status=200)
         else:
             return Response({"detail": "Invalid verification link or token."}, status=400)
+
+

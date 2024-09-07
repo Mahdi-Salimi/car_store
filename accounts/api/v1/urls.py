@@ -23,5 +23,4 @@ urlpatterns = [
     path('verify-email/', EmailVerificationView.as_view(), name='verify-email'),
     path('verify-email/<uidb64>/<token>/', VerifyEmailView.as_view(), name='verify-email-confirm'),
     # path('user-activity/', UserActivityView.as_view(), name='user-activity'),
-
 ]
