@@ -4,8 +4,11 @@ from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.exceptions import AuthenticationFailed
 
+from django.core.exceptions import ValidationError
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_decode
+
+from accounts.models import CustomUser, OTP
 
 
 from accounts.models import BuyerUserProfile, SellerUserProfile
@@ -66,12 +69,19 @@ class SellerUserProfileSerializer(serializers.ModelSerializer):
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
+    password2 = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ['email', 'user_type', 'phone_number', 'date_of_birth', 'address', 'password']
+        fields = ['email', 'user_type', 'phone_number', 'date_of_birth', 'address', 'password', 'password2']
+
+    def validate(self, data):
+        if data['password'] != data['password2']:
+            raise serializers.ValidationError("Passwords do not match.")
+        return data
 
     def create(self, validated_data):
+        validated_data.pop('password2')
         user = User.objects.create_user(**validated_data)
         return user
 
@@ -105,24 +115,34 @@ class SendOTPSerializer(serializers.Serializer):
             raise serializers.ValidationError("User with this email does not exist.")
         return value
 
+
+
 class VerifyOTPSerializer(serializers.Serializer):
     email = serializers.EmailField()
     otp = serializers.CharField(max_length=6)
 
     def validate(self, data):
-        user = User.objects.get(email=data['email'])
+        email = data['email']
+        otp_value = data['otp']
+
+        try:
+            user = CustomUser.objects.get(email=email)
+        except CustomUser.DoesNotExist:
+            raise serializers.ValidationError({'non_field_errors': 'User does not exist.'})
+
         try:
             otp_record = user.otp_set.latest('created_at')
         except OTP.DoesNotExist:
-            raise serializers.ValidationError("OTP does not exist or has expired.")
+            raise serializers.ValidationError({'non_field_errors': 'OTP does not exist or has expired.'})
 
         if not otp_record.is_valid():
-            raise serializers.ValidationError("OTP has expired.")
+            raise serializers.ValidationError({'non_field_errors': 'OTP has expired.'})
 
-        if not otp_record.check_otp(data['otp']):
-            raise serializers.ValidationError("Invalid OTP.")
+        if not otp_record.check_otp(otp_value):
+            raise serializers.ValidationError({'non_field_errors': 'Invalid OTP.'})
 
         return data
+
 
 class PasswordResetSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -137,26 +157,31 @@ class PasswordResetSerializer(serializers.Serializer):
 class PasswordResetConfirmSerializer(serializers.Serializer):
     uidb64 = serializers.CharField()
     token = serializers.CharField()
-    new_password = serializers.CharField()
+    new_password = serializers.CharField(write_only=True)
+    new_password_confirm = serializers.CharField(write_only=True)
 
     def validate(self, data):
         try:
             uid = urlsafe_base64_decode(data['uidb64']).decode()
             user = User.objects.get(pk=uid)
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-            raise serializers.ValidationError('Invalid token or user ID')
+            raise serializers.ValidationError({'uidb64': 'Invalid token or user ID'})
 
         if not default_token_generator.check_token(user, data['token']):
-            raise serializers.ValidationError('Invalid token')
+            raise serializers.ValidationError({'token': 'Invalid token'})
+
+        if data['new_password'] != data['new_password_confirm']:
+            raise serializers.ValidationError({'new_password_confirm': 'Passwords do not match'})
 
         return data
 
     def save(self):
         uid = urlsafe_base64_decode(self.validated_data['uidb64']).decode()
         user = User.objects.get(pk=uid)
-        user.set_password(self.validated_data['new_password'])
+        new_password = self.validated_data['new_password']
+        user.set_password(new_password)
         user.save()
-        return user
+
 
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(write_only=True)
@@ -165,13 +190,13 @@ class ChangePasswordSerializer(serializers.Serializer):
 
     def validate(self, data):
         if data['new_password'] != data['new_password_confirm']:
-            raise serializers.ValidationError("The new passwords do not match.")
+            raise serializers.ValidationError({"new_password_confirm": "The new passwords do not match."})
         return data
 
     def validate_old_password(self, value):
         user = self.context['request'].user
         if not user.check_password(value):
-            raise serializers.ValidationError("Old password is incorrect.")
+            raise serializers.ValidationError({"old_password": "Old password is incorrect."})
         return value
 
     def save(self):

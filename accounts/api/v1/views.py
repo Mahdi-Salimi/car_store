@@ -15,6 +15,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.contrib.sites.shortcuts import get_current_site
 
 
+
 from accounts.utils import generate_otp
 from accounts.tasks import send_otp_email, send_password_reset_email, send_verification_email
 
@@ -105,9 +106,22 @@ class VerifyOTPView(APIView):
     def post(self, request):
         serializer = VerifyOTPSerializer(data=request.data)
         if serializer.is_valid():
-            user = User.objects.get(email=serializer.validated_data['email'])
+            try:
+                user = User.objects.get(email=serializer.validated_data['email'])
+            except User.DoesNotExist:
+                return Response(
+                    {"non_field_errors": ["User does not exist."]},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-            otp_record = user.otp_set.latest('created_at')
+            try:
+                otp_record = user.otp_set.latest('created_at')
+            except OTP.DoesNotExist:
+                return Response(
+                    {"non_field_errors": ["OTP not found for this user."]},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             otp_record.used_at = timezone.now()
             otp_record.save()
 
@@ -127,18 +141,21 @@ class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        refresh_token = request.data.get("refresh_token")
+
+        if refresh_token is None:
+            return Response({"detail": "Refresh token is required."}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
-            refresh_token = request.data.get("refresh_token")
             token = RefreshToken(refresh_token)
             token.blacklist()
             return Response({"detail": "Logout successful."}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "Invalid or expired token."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PasswordResetView(generics.GenericAPIView):
     serializer_class = PasswordResetSerializer
-    permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -156,7 +173,6 @@ class PasswordResetView(generics.GenericAPIView):
 
 class PasswordResetConfirmView(generics.GenericAPIView):
     serializer_class = PasswordResetConfirmSerializer
-    permission_classes = [IsAuthenticated]
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -165,7 +181,6 @@ class PasswordResetConfirmView(generics.GenericAPIView):
         return Response({"detail": "Password has been reset successfully."}, status=status.HTTP_200_OK)
 
 class ChangePasswordView(generics.UpdateAPIView):
-
     serializer_class = ChangePasswordSerializer
     model = get_user_model()
     permission_classes = [IsAuthenticated]
@@ -176,11 +191,12 @@ class ChangePasswordView(generics.UpdateAPIView):
     def update(self, request, *args, **kwargs):
         self.object = self.get_object()
         serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response({'detail': 'Password changed successfully'}, status=status.HTTP_200_OK)
 
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'detail': 'Password changed successfully'}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def perform_update(self, serializer):
+        serializer.save()
 
 class DeleteAccountView(APIView):
     permission_classes = [IsAuthenticated]

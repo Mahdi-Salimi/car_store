@@ -1,6 +1,7 @@
 import pytest
 
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -23,7 +24,7 @@ def create_user():
 
 @pytest.fixture
 def buyer_user(create_user):
-    user = create_user(email='buyer_unique@example.com', password='password123@#QW', user_type=User.UserType.BUYER)
+    user = create_user(email='buyer_unique@example.com', password='1234QWas@#', user_type=User.UserType.BUYER)
 
     if not BuyerUserProfile.objects.filter(user=user).exists():
         BuyerUserProfile.objects.create(user=user)
@@ -33,7 +34,7 @@ def buyer_user(create_user):
 
 @pytest.fixture
 def seller_user(create_user):
-    user = create_user(email='seller_unique@example.com', password='password1231@#QW', user_type=User.UserType.SELLER)
+    user = create_user(email='seller_unique@example.com', password='1234QWas@#', user_type=User.UserType.SELLER)
 
     if not SellerUserProfile.objects.filter(user=user).exists():
         SellerUserProfile.objects.create(
@@ -75,3 +76,12 @@ def buyer_user_serializer(buyer_user_profile):
 @pytest.fixture
 def seller_user_serializer(seller_user_profile):
     return SellerUserProfileSerializer(instance=seller_user_profile)
+
+@pytest.fixture(autouse=True)
+def clear_cache():
+    cache.clear()
+
+@pytest.fixture
+def valid_refresh_token(buyer_user):
+    refresh = RefreshToken.for_user(buyer_user)
+    return str(refresh)
