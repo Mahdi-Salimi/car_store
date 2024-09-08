@@ -74,7 +74,7 @@ def ad_instance(car_instance, seller_user):
         is_promoted=False,
         start_date=timezone.now(),
         end_date=timezone.now() + timezone.timedelta(days=30),
-        payment_status="pending"
+        status="active"
     )
 
 @pytest.fixture
@@ -94,7 +94,7 @@ def promoted_ad_instance(car_instance, seller_user):
         is_promoted=True,
         start_date=timezone.now(),
         end_date=timezone.now() + timezone.timedelta(days=30),
-        payment_status="paid"
+        status="active"
     )
 
 @pytest.fixture
@@ -105,7 +105,7 @@ def non_promoted_ad_instance(another_car_instance, seller_user):
         is_promoted=False,
         start_date=timezone.now(),
         end_date=timezone.now() + timezone.timedelta(days=30),
-        payment_status="pending"
+        status="active"
     )
 
 @pytest.fixture
@@ -116,7 +116,7 @@ def another_seller_ad_instance(another_car_instance, buyer_user):
         is_promoted=False,
         start_date=timezone.now(),
         end_date=timezone.now() + timezone.timedelta(days=30),
-        payment_status="pending"
+        status="active"
     )
 
 

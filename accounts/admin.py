@@ -6,7 +6,7 @@ from accounts.models import CustomUser, SellerUserProfile, BuyerUserProfile
 
 
 class CustomUserAdmin(BaseUserAdmin):
-    list_display = ('email', 'user_type', 'phone_number', 'date_of_birth', 'is_staff', 'is_active', 'email_verified')
+    list_display = ('id', 'email', 'user_type', 'phone_number', 'date_of_birth', 'is_staff', 'is_active', 'email_verified')
     list_filter = ('user_type', 'is_staff', 'is_active')
 
     fieldsets = (

@@ -126,7 +126,12 @@ async def insert_data(results):
             car_data['mileage'] = parse_mileage(car_data.get('mileage', ''))
             car_data['price'] = parse_price(car_data.get('price', ''))
 
-            exists = await sync_to_async(Car.objects.filter(url=car_data['url'], time=car_data['time']).exists)()
+            exists = await sync_to_async(lambda: Car.objects.filter(
+                url=car_data['url'],
+                title=car_data['title'],
+                year=car_data['year'],
+                price=car_data['price']).exists())()
+
             if not exists:
                 await sync_to_async(Car.objects.create)(
                     url=car_data['url'],

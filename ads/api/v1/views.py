@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions, status, generics
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
@@ -20,13 +20,22 @@ class AdViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(seller=self.request.user)
 
-
-class PromotedAdViewSet(viewsets.ModelViewSet):
+class PromotedAdListView(generics.ListAPIView):
     queryset = Ad.objects.filter(is_promoted=True)
     serializer_class = AdSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-class SellerAdViewSet(viewsets.ModelViewSet):
+class SellerAdListCreateView(generics.ListCreateAPIView):
+    serializer_class = AdSerializer
+    permission_classes = [permissions.IsAuthenticated, IsSellerPermission]
+
+    def get_queryset(self):
+        return Ad.objects.filter(seller=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(seller=self.request.user)
+
+class SellerAdRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = AdSerializer
     permission_classes = [permissions.IsAuthenticated, IsSellerPermission]
 
