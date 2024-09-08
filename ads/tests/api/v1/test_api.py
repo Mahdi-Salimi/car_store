@@ -1,6 +1,6 @@
 from django.urls import reverse
 from rest_framework import status
-from ads.tests.fixtures.fixtures_data import *
+from ads.tests.fixtures.conftest import *
 
 from products.models import Car
 from ads.models import Ad

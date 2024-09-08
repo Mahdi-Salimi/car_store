@@ -2,7 +2,7 @@ import pytest
 
 from django.contrib.auth import get_user_model
 
-from accounts.tests.fixtures.fixtures_data import seller_user, buyer_user, buyer_user_profile, seller_user_profile, create_user
+from accounts.tests.fixtures.conftest import seller_user, buyer_user, buyer_user_profile, seller_user_profile, create_user
 from accounts.models import BuyerUserProfile, SellerUserProfile
 
 User = get_user_model()

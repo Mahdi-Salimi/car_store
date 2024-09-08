@@ -16,7 +16,7 @@ from accounts.models import OTP, User
 from accounts.models import BuyerUserProfile
 from django.contrib.auth.tokens import default_token_generator
 
-from accounts.tests.fixtures.fixtures_data import *
+from accounts.tests.fixtures.conftest import *
 
 
 @pytest.mark.django_db

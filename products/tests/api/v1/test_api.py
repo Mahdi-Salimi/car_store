@@ -1,7 +1,7 @@
 import pytest
 from django.urls import reverse
 from rest_framework import status
-from products.tests.fixtures.fixtures_data import *
+from products.tests.fixtures.conftest import *
 
 @pytest.mark.django_db
 def test_car_list_unauthenticated(api_client):

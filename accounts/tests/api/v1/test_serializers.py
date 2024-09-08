@@ -1,6 +1,6 @@
 import pytest
 
-from accounts.tests.fixtures.fixtures_data import (
+from accounts.tests.fixtures.conftest import (
     buyer_user_serializer,
     seller_user_serializer,
     seller_user_profile,
