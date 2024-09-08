@@ -169,7 +169,6 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 
-# settings.py
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
@@ -181,5 +180,8 @@ CACHES = {
 }
 
 CACHE_TTL = 60 * 60 * 24
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 

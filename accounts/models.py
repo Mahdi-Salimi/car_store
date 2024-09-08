@@ -7,8 +7,8 @@ from django.contrib.auth.models import BaseUserManager
 from django.utils import timezone
 from django.contrib.auth.hashers import make_password, check_password
 
-
 from accounts.validations.models_validations import validate_phone_number
+
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -26,8 +26,10 @@ class CustomUserManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
+
 class CustomUser(AbstractUser):
     objects = CustomUserManager()
+
     class UserType(models.TextChoices):
         BUYER = 'b', 'Buyer'
         SELLER = 's', 'Seller'
@@ -60,15 +62,16 @@ class CustomUser(AbstractUser):
 
 class BuyerUserProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
-    # profile_picture
+    image = models.ImageField(upload_to='accounts/images', blank=True)
 
     def __str__(self):
         return f'{self.user.username} (Buyer)'
 
+
 class SellerUserProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
     company_name = models.CharField(max_length=255, blank=True)
-    # profile_picture
+    image = models.ImageField(upload_to='accounts/images', blank=True)
     website = models.URLField(blank=True, null=True)
     rating = models.DecimalField(max_digits=3, decimal_places=2, blank=True, null=True)
     total_sales = models.PositiveIntegerField(default=0)
@@ -76,7 +79,9 @@ class SellerUserProfile(models.Model):
     def __str__(self):
         return f'{self.user.username} (Seller)'
 
+
 User = get_user_model()
+
 
 class OTP(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -96,6 +101,3 @@ class OTP(models.Model):
 
     def check_otp(self, otp):
         return check_password(otp, self.otp)
-
-
-

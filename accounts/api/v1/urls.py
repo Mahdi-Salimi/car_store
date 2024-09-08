@@ -7,7 +7,7 @@ from accounts.api.v1.views import CustomUserRetrieveUpdateView, BuyerUserProfile
     VerifyEmailView, EmailVerificationView
 
 urlpatterns = [
-    path('', CustomUserRetrieveUpdateView.as_view(), name='user-detail'),
+    path('user_detail', CustomUserRetrieveUpdateView.as_view(), name='user-detail'),
     path('buyerprofile/', BuyerUserProfileView.as_view(), name='buyer-profile'),
     path('sellerprofile/', SellerUserProfileView.as_view(), name='seller-profile'),
     path('register/', RegisterView.as_view(), name='register'),
@@ -22,5 +22,4 @@ urlpatterns = [
     path('delete-account/', DeleteAccountView.as_view(), name='delete-account'),
     path('verify-email/', EmailVerificationView.as_view(), name='verify-email'),
     path('verify-email/<uidb64>/<token>/', VerifyEmailView.as_view(), name='verify-email-confirm'),
-    # path('user-activity/', UserActivityView.as_view(), name='user-activity'),
 ]
