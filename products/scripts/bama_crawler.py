@@ -33,10 +33,6 @@ def parse_time(time_str):
     now = datetime.utcnow()
     if 'لحظاتی پیش' in time_str:
         return now
-    elif 'دقایقی پیش' in time_str:
-        minutes = int(re.search(r'\d+', time_str).group())
-        return now - timedelta(minutes=minutes)
-    # Add more cases if there are other formats
     try:
         return date_parser.parse(time_str)
     except ValueError:
