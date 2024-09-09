@@ -4,6 +4,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from accounts.api.v1.serializers import SellerContactSerializer
 from rest_framework import filters
+from rest_framework.exceptions import PermissionDenied
+
 
 from django.contrib.auth.models import Group
 
@@ -55,6 +57,6 @@ class SellerContactView(generics.RetrieveAPIView):
         seller = ad.seller
 
         if not self.request.user.email_verified:
-            self.permission_denied(self.request)
+            raise PermissionDenied(detail="Please verify your email first.")
 
         return seller
