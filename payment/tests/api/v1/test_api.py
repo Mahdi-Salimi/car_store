@@ -37,10 +37,13 @@ def test_get_payment_list(user):
 def test_update_payment(user, payment):
     client = APIClient()
     client.force_authenticate(user=user)
+    assert payment.ad.seller == user, "The user must be the seller of the ad"
+
     url = reverse('payment-detail', args=[payment.id])
     data = {
         "amount": 500,
     }
+
     response = client.patch(url, data, format='json')
 
     assert response.status_code == 200, f"Expected 200 but got {response.status_code} with {response.data}"
