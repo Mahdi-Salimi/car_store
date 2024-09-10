@@ -52,22 +52,21 @@ def test_car_detail(api_client, seller_user, car_instance):
     assert response.data['title'] == car_instance.title
 
 @pytest.mark.django_db
-def test_car_update(api_client, seller_user, car_instance):
+def test_car_update_not_super_user(api_client, seller_user, car_instance):
     api_client.force_authenticate(user=seller_user)
     url = reverse('car-detail', args=[car_instance.id])
     data = {
         "title": "Updated Car Title"
     }
     response = api_client.patch(url, data, format='json')
-    assert response.status_code == status.HTTP_200_OK
-    assert response.data['title'] == data['title']
+    assert response.status_code == status.HTTP_403_FORBIDDEN
 
 @pytest.mark.django_db
-def test_car_delete(api_client, seller_user, car_instance):
+def test_car_delet_not_super_user(api_client, seller_user, car_instance):
     api_client.force_authenticate(user=seller_user)
     url = reverse('car-detail', args=[car_instance.id])
     response = api_client.delete(url)
-    assert response.status_code == status.HTTP_204_NO_CONTENT
+    assert response.status_code == status.HTTP_403_FORBIDDEN
 
 # @pytest.mark.django_db
 # def test_add_to_wishlist(api_client, seller_user, car_instance):

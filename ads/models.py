@@ -28,7 +28,7 @@ class Ad(models.Model):
     )
 
     def __str__(self):
-        return f"Ad for {self.car.title} by {self.seller.username}"
+        return f"Ad for {self.car.title} by {self.seller.email}"
 
     def clean(self):
         if self.end_date and self.end_date <= self.start_date:

@@ -11,6 +11,7 @@ from rest_framework import status
 
 from django_filters.rest_framework import DjangoFilterBackend
 from products.filters import CarFilter
+from products.permissions import IsSuperUserOrReadOnly
 
 class CarViewSet(viewsets.ModelViewSet):
     queryset = Car.objects.all()
@@ -19,10 +20,8 @@ class CarViewSet(viewsets.ModelViewSet):
     filterset_class = CarFilter
     search_fields = ['title', 'description', 'location']
     ordering_fields = ['created_at', 'price', 'year']
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsSuperUserOrReadOnly]
 
-    def perform_create(self, serializer):
-        serializer.save(seller=self.request.user)
 
 class WishlistViewSet(viewsets.ModelViewSet):
     queryset = Wishlist.objects.all()

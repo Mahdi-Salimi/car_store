@@ -3,12 +3,6 @@ from rest_framework import permissions
 import logging
 logger = logging.getLogger(__name__)
 
-from rest_framework import permissions
-import logging
-
-logger = logging.getLogger(__name__)
-
-
 class IsSellerPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
