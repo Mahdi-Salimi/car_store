@@ -2,7 +2,7 @@ from rest_framework import viewsets, permissions, status, generics
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
-from django.db.models import F
+from django.db.models import F,Q
 from rest_framework.decorators import action
 
 from accounts.api.v1.serializers import SellerContactSerializer
@@ -17,16 +17,35 @@ from .serializers import AdSerializer, WishlistSerializer
 from ads.permissions import IsSellerPermission
 from accounts.permissions import IsOwner
 
+
+
+
 class AdViewSet(viewsets.ModelViewSet):
-    queryset = Ad.objects.all().order_by(F('is_promoted').desc(), 'id')
     serializer_class = AdSerializer
     permission_classes = [IsSellerPermission]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['car__title', 'car__mileage', 'car__year', 'start_date', 'end_date']
     ordering_fields = ['start_date', 'end_date', 'is_promoted']
 
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Ad.objects.all()
+
+        if user.is_authenticated:
+            wishlist_ads = Wishlist.objects.filter(user=user).values_list('ad', flat=True)
+
+            queryset = queryset.filter(
+                Q(is_promoted=True) |
+                Q(id__in=wishlist_ads) |
+                Q(car__title__in=Ad.objects.filter(id__in=wishlist_ads).values_list('car__title', flat=True)) |
+                Q(car__mileage__in=Ad.objects.filter(id__in=wishlist_ads).values_list('car__mileage', flat=True))
+            )
+
+        return queryset.order_by(F('is_promoted').desc(), 'id')
+
     def perform_create(self, serializer):
         serializer.save(seller=self.request.user)
+
 
 class PromotedAdListView(generics.ListAPIView):
     queryset = Ad.objects.filter(is_promoted=True)
