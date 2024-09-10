@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.db import transaction
 
-from ads.models import Ad
+from ads.models import Ad, Wishlist
 from products.api.v1.serializers import CarSerializer
 from products.models import Car, CarImage
 
@@ -44,3 +44,17 @@ class AdSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
         return instance
+
+class WishlistSerializer(serializers.ModelSerializer):
+    ad = serializers.PrimaryKeyRelatedField(queryset=Ad.objects.all())
+
+    class Meta:
+        model = Wishlist
+        fields = ['id', 'user', 'ad', 'added_at']
+        read_only_fields = ['user', 'added_at']
+
+    def validate_ad(self, value):
+        user = self.context['request'].user
+        if Wishlist.objects.filter(user=user, ad=value).exists():
+            raise serializers.ValidationError("You have already added this ad to your wishlist.")
+        return value

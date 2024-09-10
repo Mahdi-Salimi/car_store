@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from django.db.models import F
+from rest_framework.decorators import action
+
 from accounts.api.v1.serializers import SellerContactSerializer
 from rest_framework import filters
 from rest_framework.exceptions import PermissionDenied
@@ -10,9 +12,10 @@ from rest_framework.exceptions import PermissionDenied
 
 from django.contrib.auth.models import Group
 
-from ads.models import Ad
-from .serializers import AdSerializer
+from ads.models import Ad, Wishlist
+from .serializers import AdSerializer, WishlistSerializer
 from ads.permissions import IsSellerPermission
+from accounts.permissions import IsOwner
 
 class AdViewSet(viewsets.ModelViewSet):
     queryset = Ad.objects.all().order_by(F('is_promoted').desc(), 'id')
@@ -60,3 +63,25 @@ class SellerContactView(generics.RetrieveAPIView):
             raise PermissionDenied(detail="Please verify your email first.")
 
         return seller
+
+class WishlistViewSet(viewsets.ModelViewSet):
+    queryset = Wishlist.objects.all()
+    serializer_class = WishlistSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Wishlist.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        if self.request.user.user_type == 's':
+            raise PermissionDenied("Sellers are not allowed to add ads to the wishlist.")
+        serializer.save(user=self.request.user)
+
+    @action(detail=True, methods=['delete'])
+    def remove(self, request, pk=None):
+        try:
+            wishlist_item = self.get_object()
+            wishlist_item.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Wishlist.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)

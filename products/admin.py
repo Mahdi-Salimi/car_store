@@ -1,5 +1,5 @@
 from django.contrib import admin
-from products.models import Car, CarImage, Wishlist
+from products.models import Car, CarImage
 
 @admin.register(Car)
 class CarAdmin(admin.ModelAdmin):
@@ -10,6 +10,4 @@ class CarAdmin(admin.ModelAdmin):
 class CarImageAdmin(admin.ModelAdmin):
     list_display = ['car', 'image_url']
 
-@admin.register(Wishlist)
-class WishlistAdmin(admin.ModelAdmin):
-    list_display = ['user', 'car', 'added_at']
+

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from ads.models import Ad
+from ads.models import Ad, Wishlist
 from products.models import Car
 
 class AdAdmin(admin.ModelAdmin):
@@ -11,3 +11,7 @@ class AdAdmin(admin.ModelAdmin):
     autocomplete_fields = ['car', 'seller']
 
 admin.site.register(Ad, AdAdmin)
+
+@admin.register(Wishlist)
+class WishlistAdmin(admin.ModelAdmin):
+    list_display = ['user', 'ad', 'added_at']

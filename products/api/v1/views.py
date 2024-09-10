@@ -2,8 +2,8 @@ from rest_framework import viewsets, permissions, filters
 from rest_framework import viewsets
 from rest_framework.decorators import action
 
-from products.models import Car, Wishlist, CarImage
-from products.api.v1.serializers import CarSerializer, WishlistSerializer, CarImageSerializer
+from products.models import Car,CarImage
+from products.api.v1.serializers import CarSerializer,CarImageSerializer
 from accounts.permissions import IsOwner
 from rest_framework.response import Response
 from rest_framework import status
@@ -21,27 +21,6 @@ class CarViewSet(viewsets.ModelViewSet):
     search_fields = ['title', 'description', 'location']
     ordering_fields = ['created_at', 'price', 'year']
     permission_classes = [permissions.IsAuthenticated, IsSuperUserOrReadOnly]
-
-
-class WishlistViewSet(viewsets.ModelViewSet):
-    queryset = Wishlist.objects.all()
-    serializer_class = WishlistSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwner]
-
-    def get_queryset(self):
-        return Wishlist.objects.filter(user=self.request.user)
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-    @action(detail=True, methods=['delete'])
-    def remove(self, request, pk=None):
-        try:
-            wishlist_item = self.get_object()
-            wishlist_item.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except Wishlist.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
 
 class CarImageViewSet(viewsets.ModelViewSet):
     queryset = CarImage.objects.all()

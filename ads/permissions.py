@@ -28,3 +28,4 @@ class IsSellerPermission(permissions.BasePermission):
 
         return True
 
+

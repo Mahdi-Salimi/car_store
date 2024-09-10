@@ -51,3 +51,14 @@ class Ad(models.Model):
         verbose_name = 'Advertisement'
         verbose_name_plural = 'Advertisements'
 
+
+class Wishlist(models.Model):
+    user = models.ForeignKey(User, related_name='wishlists', on_delete=models.CASCADE)
+    ad = models.ForeignKey(Ad, related_name='ad_wishlisted_by', on_delete=models.CASCADE)
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'ad')
+
+    def __str__(self):
+        return f"{self.user.email}'s wishlist item: {self.ad.car.title}"

@@ -1,7 +1,7 @@
 import pytest
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
-from products.models import Car, CarImage, Wishlist
+from products.models import Car, CarImage
 from django.utils import timezone
 
 User = get_user_model()
@@ -57,12 +57,4 @@ def car_image_instance(car_instance):
     return CarImage.objects.create(
         car=car_instance,
         image_url="http://example.com/image1.jpg"
-    )
-
-@pytest.fixture
-def wishlist_instance(seller_user, car_instance):
-    return Wishlist.objects.create(
-        user=seller_user,
-        car=car_instance,
-        added_at=timezone.now()
     )

@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from products.models import Car, CarImage, Wishlist
-
+from products.models import Car, CarImage
 class CarImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = CarImage
@@ -14,10 +13,4 @@ class CarSerializer(serializers.ModelSerializer):
         fields = ['id', 'url', 'title', 'time', 'year', 'mileage', 'location', 'description', 'images', 'created_at', 'price']
         read_only_fields = ['id', 'url', 'time', 'created_at']
 
-class WishlistSerializer(serializers.ModelSerializer):
-    car = CarSerializer(read_only=True)
 
-    class Meta:
-        model = Wishlist
-        fields = ['id', 'user', 'car', 'added_at']
-        read_only_fields = ['user', 'added_at']
