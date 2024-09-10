@@ -23,12 +23,12 @@ class CustomUserSerializer(serializers.ModelSerializer):
 class CustomUserFullSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = '__all__'
-        read_only_fields = ['email']
+        exclude = ['password', 'last_login', 'is_superuser', 'is_staff', 'is_active', 'groups', 'user_permissions']
+        read_only_fields = ['email', 'user_type']
 
 
 class BuyerUserProfileSerializer(serializers.ModelSerializer):
-    user = CustomUserSerializer()
+    user = CustomUserFullSerializer()
 
     class Meta:
         model = BuyerUserProfile
@@ -48,7 +48,7 @@ class BuyerUserProfileSerializer(serializers.ModelSerializer):
         return instance
 
 class SellerUserProfileSerializer(serializers.ModelSerializer):
-    user = CustomUserSerializer()
+    user = CustomUserFullSerializer()
 
     class Meta:
         model = SellerUserProfile
