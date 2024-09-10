@@ -31,7 +31,7 @@ class AdViewSet(viewsets.ModelViewSet):
         user = self.request.user
         queryset = Ad.objects.all()
 
-        if user.is_authenticated:
+        if user.is_authenticated and user.user_type == 'b':
             wishlist_ads = Wishlist.objects.filter(user=user).values_list('ad', flat=True)
 
             queryset = queryset.filter(

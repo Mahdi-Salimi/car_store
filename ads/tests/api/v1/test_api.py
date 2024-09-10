@@ -25,8 +25,9 @@ def test_update_ad_as_seller(api_client, seller_user, ad_instance, ad_data):
 
     updated_data = ad_data.copy()
     updated_data['car']['title'] = "Updated Car Title"
-
+    print(ad_instance.id)
     response = api_client.put(f'/ads/api/v1/ads/{ad_instance.id}/', data=updated_data, format='json')
+    print(response.data)
     assert response.status_code == 200
     assert response.data['car']['title'] == "Updated Car Title"
 
