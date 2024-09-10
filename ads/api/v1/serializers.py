@@ -5,13 +5,14 @@ from ads.models import Ad
 from products.api.v1.serializers import CarSerializer
 from products.models import Car, CarImage
 
+
 class AdSerializer(serializers.ModelSerializer):
     car = CarSerializer()
 
     class Meta:
         model = Ad
         fields = ['id', 'seller', 'car', 'is_promoted', 'start_date', 'end_date', 'status']
-        read_only_fields = ['seller']
+        read_only_fields = ['seller', 'start_date', 'end_date', 'status', 'is_promoted']
 
     def create(self, validated_data):
         validated_data.pop('seller', None)
