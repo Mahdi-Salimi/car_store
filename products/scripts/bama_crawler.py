@@ -5,8 +5,8 @@ import logging
 import os
 import django
 import re
-from datetime import datetime, timedelta
 
+from datetime import datetime, timedelta
 from django.utils import timezone
 from dateutil import parser as date_parser
 from dateutil.relativedelta import relativedelta
@@ -57,6 +57,7 @@ def extract_car_json_data(response_json):
         values = {key: car.get(key) for key in detail_keys}
         price = ad.get('price', {}).get('price')
         values['price'] = price
+        values['url'] = 'https://bama.ir' + values['url']
         cars.append(values)
     return cars
 
